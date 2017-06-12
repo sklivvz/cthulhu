@@ -1,12 +1,40 @@
 #include "redismodule.h"
+#include "duktape.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include "duktape.h"
 
 duk_context *_ctx;
+RedisModuleCtx *RM_ctx;
+
+duk_ret_t lpush(duk_context *_ctx) {
+
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_bool_t where = duk_require_boolean(_ctx, 1); // true: head, false: tail
+  const char * value = duk_require_string(_ctx, 2); // value
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  
+  RedisModule_ListPush(
+    key_h, 
+    (where ? REDISMODULE_LIST_HEAD : REDISMODULE_LIST_TAIL),
+    RMS_Value
+  );
+
+  printf("\nlpush called with %s, %s, %d\n", key, value, where);
+
+  RedisModule_CloseKey(key_h);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  return 0;
+}
 
 int load_file_to_context(const char *filename) 
 { 
@@ -41,12 +69,14 @@ int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, in
 
   size_t length;
 
+  RM_ctx = ctx;
+
   if (argc < 2) {
     return RedisModule_WrongArity(ctx);
   }
 
   duk_push_global_object(_ctx);
-  duk_get_prop_string(_ctx, -1 /*index*/, RedisModule_StringPtrLen(argv[1], &length));
+  duk_get_prop_string(_ctx, -1, RedisModule_StringPtrLen(argv[1], &length));
 
   for (int i = 2; i < argc; i++) {
     duk_push_string(_ctx, RedisModule_StringPtrLen(argv[i], &length));
@@ -58,7 +88,7 @@ int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, in
     return RedisModule_ReplyWithSimpleString(ctx, error);
   }
   
-  const char * result = duk_safe_to_string(_ctx, -1);
+  const char * result = duk_to_string(_ctx, -1);
   duk_pop(_ctx);
 
   if (result == NULL) {
@@ -69,7 +99,8 @@ int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, in
 }
 
 int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-  int step = 0;
+  
+  RM_ctx = ctx;
   
   if (RedisModule_Init(ctx,"cthulhu",1,REDISMODULE_APIVER_1) == REDISMODULE_ERR) {
     return REDISMODULE_ERR;
@@ -88,6 +119,10 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     printf("Failed to create a Duktape heap.\n");
     return REDISMODULE_ERR;
   }
+
+  duk_push_global_object(_ctx);
+  duk_push_c_function(_ctx, lpush, 3);
+  duk_put_prop_string(_ctx, -2, "redisLPush");
 
   if (load_file_to_context(filename)<0) return REDISMODULE_ERR;
 
