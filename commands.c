@@ -8,13 +8,34 @@
 
 void register_commands(duk_context *_ctx) {
   duk_push_global_object(_ctx);
+  duk_idx_t idx_top = duk_get_top_index(_ctx);
  
-  duk_push_c_function(_ctx, list_push, 3);
-  duk_put_prop_string(_ctx, -2, "redisListPush");
+  duk_push_c_function(_ctx, milliseconds, 0);
+  duk_put_prop_string(_ctx, idx_top, "redisMilliseconds");
 
+  duk_push_c_function(_ctx, list_push, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisListPush");
+
+  duk_push_c_function(_ctx, log_to_redis, 2);
+  duk_put_prop_string(_ctx, idx_top, "redisLog");
+}
+
+duk_ret_t milliseconds(duk_context *_ctx){
+  printf("MS: %i",(int)RedisModule_Milliseconds());
+  duk_push_number(_ctx, RedisModule_Milliseconds());
+}
+
+duk_ret_t get_client_id(duk_context *_ctx){
 
 }
 
+duk_ret_t get_selected_db(duk_context *_ctx){
+
+}
+
+duk_ret_t select_db(duk_context *_ctx){
+
+}
 
 duk_ret_t list_push(duk_context *_ctx) {
 
@@ -41,7 +62,17 @@ duk_ret_t list_push(duk_context *_ctx) {
   return 0;
 }
 
+duk_ret_t list_pop(duk_context *_ctx) {
 
+}
+
+duk_ret_t log_to_redis(duk_context *_ctx){
+  const char * level = duk_to_string(_ctx, 0);
+  const char * message = duk_to_string(_ctx, 1);
+  RedisModule_Log(RM_ctx, level, message);
+  duk_pop(_ctx);
+  duk_pop(_ctx);
+}
 
 int load_file_to_context(duk_context *_ctx, const char *filename) { 
 	size_t size = 0;
