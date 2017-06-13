@@ -23,8 +23,8 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [x] get_client_id
  * [x] get_selected_db
  * [x] select_db
- * [ ] length
- * [ ] delete_key
+ * [x] length
+ * [x] delete_key
  * [ ] get_expire
  * [ ] set_expire
  * [ ] string_set
