@@ -19,6 +19,9 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, get_selected_db, 0);
   duk_put_prop_string(_ctx, idx_top, "redisGetSelectedDb");
 
+  duk_push_c_function(_ctx, select_db, 1);
+  duk_put_prop_string(_ctx, idx_top, "redisSelectDb");
+
   duk_push_c_function(_ctx, list_push, 3);
   duk_put_prop_string(_ctx, idx_top, "redisListPush");
 
@@ -42,7 +45,9 @@ duk_ret_t get_selected_db(duk_context *_ctx){
 }
 
 duk_ret_t select_db(duk_context *_ctx){
-
+  int newid = duk_require_int(_ctx, 0);
+  RedisModule_SelectDb(RM_ctx, newid);
+  return 0;
 }
 
 duk_ret_t list_push(duk_context *_ctx) {
