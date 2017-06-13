@@ -6,7 +6,12 @@ function theOldOne ( name ) {
     redisLog("warning", "redisGetClientId: " + redisGetClientId());
     redisLog("warning", "redisGetSelectedDb: " + redisGetSelectedDb());
     redisLog("warning", "redisSelectDb: ", redisSelectDb(1));
-    redisListPush("cthulhu", true, name + count);
+    redisListPush("cthulhu", true, 1);
+    redisListPush("cthulhu", true, 2);
+    redisListPush("cthulhu", true, 3);
+    redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
+    redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
+    redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";

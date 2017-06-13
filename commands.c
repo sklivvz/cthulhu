@@ -24,6 +24,9 @@ void register_commands(duk_context *_ctx) {
 
   duk_push_c_function(_ctx, list_push, 3);
   duk_put_prop_string(_ctx, idx_top, "redisListPush");
+  
+  duk_push_c_function(_ctx, list_pop, 2);
+  duk_put_prop_string(_ctx, idx_top, "redisListPop");
 
   duk_push_c_function(_ctx, log_to_redis, 2);
   duk_put_prop_string(_ctx, idx_top, "redisLog");
@@ -54,7 +57,7 @@ duk_ret_t list_push(duk_context *_ctx) {
 
   const char * key = duk_require_string(_ctx, 0); // key name
   duk_bool_t where = duk_require_boolean(_ctx, 1); // true: head, false: tail
-  const char * value = duk_require_string(_ctx, 2); // value
+  const char * value = duk_to_string(_ctx, 2); // value
 
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
@@ -68,6 +71,7 @@ duk_ret_t list_push(duk_context *_ctx) {
   );
 
   RedisModule_CloseKey(key_h);
+  duk_pop(_ctx);
 
   RedisModule_FreeString(RM_ctx, RMS_Key);
   RedisModule_FreeString(RM_ctx, RMS_Value);
@@ -76,7 +80,28 @@ duk_ret_t list_push(duk_context *_ctx) {
 }
 
 duk_ret_t list_pop(duk_context *_ctx) {
+  size_t len;
 
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_bool_t where = duk_require_boolean(_ctx, 1); // true: head, false: tail
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  
+  RedisModuleString *RMS_Value = RedisModule_ListPop(
+    key_h, 
+    (where ? REDISMODULE_LIST_HEAD : REDISMODULE_LIST_TAIL)
+  );
+
+  RedisModule_CloseKey(key_h);
+
+  duk_push_string(_ctx, RedisModule_StringPtrLen(RMS_Value, &len));
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  return 1;
 }
 
 duk_ret_t log_to_redis(duk_context *_ctx){

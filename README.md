@@ -30,7 +30,7 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [ ] string_set
  * [ ] string_truncate
  * [x] list_push
- * [ ] list_pop
+ * [x] list_pop
  * [ ] zset_add
  * [ ] zset_incrby
  * [ ] zset_rem
