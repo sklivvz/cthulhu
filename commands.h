@@ -17,6 +17,7 @@ duk_ret_t get_expire(duk_context *_ctx);
 duk_ret_t set_expire(duk_context *_ctx);
 duk_ret_t string_set(duk_context *_ctx);
 duk_ret_t string_truncate(duk_context *_ctx);
+duk_ret_t string_get(duk_context *_ctx);
 duk_ret_t list_push(duk_context *_ctx);
 duk_ret_t list_pop(duk_context *_ctx);
 // duk_ret_t zset_add(duk_context *_ctx);

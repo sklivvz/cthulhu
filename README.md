@@ -27,8 +27,9 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [x] delete_key
  * [x] get_expire
  * [x] set_expire
- * [ ] string_set
- * [ ] string_truncate
+ * [x] string_set
+ * [x] string_truncate
+ * [x] string_get
  * [x] list_push
  * [x] list_pop
  * [ ] zset_add
@@ -49,6 +50,13 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [x] log
 
  They are documented in the [Redis Module API page](https://github.com/antirez/redis/blob/unstable/src/modules/API.md)
+
+### Roadmap
+
+* functions with variable argument number
+* return type to redis should be specific and not string
+* support for generic LUA style calls
+* create an actual JavaScript API and not simply global methods
 
  ## Version
 

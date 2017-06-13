@@ -17,6 +17,9 @@ function theOldOne ( name ) {
     redisLog("warning", "redisLength of 'cthulhu': " + redisLength("cthulhu"));
     redisLog("warning", "redisSetExpire: " + redisSetExpire("cthulhu", 10000));
     redisLog("warning", "redisGetExpire: " + redisGetExpire("cthulhu"));
+    redisLog("warning", "redisStringSet: " + redisStringSet("R'lyeh", "The nightmare corpse-city of R'lyeh…was built in measureless eons behind history by the vast, loathsome shapes that seeped down from the dark stars."));
+    redisLog("warning", "redisStringTruncate: " + redisStringTruncate("R'lyeh", 13));
+    redisLog("warning", "redisStringSet: " + redisStringGet("R'lyeh"));
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";
