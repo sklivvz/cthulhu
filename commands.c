@@ -13,6 +13,12 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, milliseconds, 0);
   duk_put_prop_string(_ctx, idx_top, "redisMilliseconds");
 
+  duk_push_c_function(_ctx, get_client_id, 0);
+  duk_put_prop_string(_ctx, idx_top, "redisGetClientId");
+
+  duk_push_c_function(_ctx, get_selected_db, 0);
+  duk_put_prop_string(_ctx, idx_top, "redisGetSelectedDb");
+
   duk_push_c_function(_ctx, list_push, 3);
   duk_put_prop_string(_ctx, idx_top, "redisListPush");
 
@@ -21,16 +27,18 @@ void register_commands(duk_context *_ctx) {
 }
 
 duk_ret_t milliseconds(duk_context *_ctx){
-  printf("MS: %i",(int)RedisModule_Milliseconds());
   duk_push_number(_ctx, RedisModule_Milliseconds());
+  return 1;
 }
 
 duk_ret_t get_client_id(duk_context *_ctx){
-
+  duk_push_number(_ctx, RedisModule_GetClientId(RM_ctx));
+  return 1;
 }
 
 duk_ret_t get_selected_db(duk_context *_ctx){
-
+  duk_push_number(_ctx, RedisModule_GetSelectedDb(RM_ctx));
+  return 1;
 }
 
 duk_ret_t select_db(duk_context *_ctx){

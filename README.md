@@ -19,9 +19,9 @@ This module *invokes commands* from Redis in a JavaScript interpreter (*the thin
 
 This are the `RedisModule` APIs that are planned for version 0.1:
 
- * [ ] milliseconds
- * [ ] get_client_id
- * [ ] get_selected_db
+ * [x] milliseconds
+ * [x] get_client_id
+ * [x] get_selected_db
  * [ ] select_db
  * [ ] length
  * [ ] delete_key

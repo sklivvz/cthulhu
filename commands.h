@@ -11,7 +11,6 @@ duk_ret_t milliseconds(duk_context *_ctx);
 duk_ret_t get_client_id(duk_context *_ctx);
 duk_ret_t get_selected_db(duk_context *_ctx);
 duk_ret_t select_db(duk_context *_ctx);
-
 // duk_ret_t length(duk_context *_ctx);
 // duk_ret_t delete_key(duk_context *_ctx);
 // duk_ret_t get_expire(duk_context *_ctx);
