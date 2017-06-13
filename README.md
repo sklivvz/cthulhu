@@ -25,8 +25,8 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [x] select_db
  * [x] length
  * [x] delete_key
- * [ ] get_expire
- * [ ] set_expire
+ * [x] get_expire
+ * [x] set_expire
  * [ ] string_set
  * [ ] string_truncate
  * [x] list_push

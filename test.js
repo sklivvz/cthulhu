@@ -12,9 +12,12 @@ function theOldOne ( name ) {
     redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
     redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
     redisLog("warning", "redisListPop: " + redisListPop("cthulhu", false));
-    redisLog("warning", "redisLength of 'cthulhu': " + redisLength("cthulhu"));
     redisLog("warning", "redisDeleteKey: " + redisDeleteKey("cthulhu"));
+    redisListPush("cthulhu", true, 4);
+    redisLog("warning", "redisLength of 'cthulhu': " + redisLength("cthulhu"));
+    redisLog("warning", "redisSetExpire: " + redisSetExpire("cthulhu", 10000));
+    redisLog("warning", "redisGetExpire: " + redisGetExpire("cthulhu"));
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";
-    }
+}

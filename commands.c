@@ -28,6 +28,12 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, delete_key, 1);
   duk_put_prop_string(_ctx, idx_top, "redisDeleteKey");
 
+  duk_push_c_function(_ctx, get_expire, 1);
+  duk_put_prop_string(_ctx, idx_top, "redisGetExpire");
+
+  duk_push_c_function(_ctx, set_expire, 2);
+  duk_put_prop_string(_ctx, idx_top, "redisSetExpire");
+
   duk_push_c_function(_ctx, list_push, 3);
   duk_put_prop_string(_ctx, idx_top, "redisListPush");
   
@@ -81,11 +87,25 @@ duk_ret_t delete_key(duk_context *_ctx){
 }
 
 duk_ret_t get_expire(duk_context *_ctx){
-
+  const char * key = duk_require_string(_ctx, 0); // key name
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  mstime_t ret = RedisModule_GetExpire(key_h);
+  RedisModule_CloseKey(key_h);
+  duk_push_number(_ctx, ret);
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  return 1;
 }
 
 duk_ret_t set_expire(duk_context *_ctx){
-
+  const char * key = duk_require_string(_ctx, 0); // key name
+  mstime_t expire = duk_require_int(_ctx, 1);
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  RedisModule_SetExpire(key_h, expire);
+  RedisModule_CloseKey(key_h);
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  return 0;
 }
 
 duk_ret_t string_set(duk_context *_ctx){
