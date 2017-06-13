@@ -22,6 +22,12 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, select_db, 1);
   duk_put_prop_string(_ctx, idx_top, "redisSelectDb");
 
+  duk_push_c_function(_ctx, length, 1);
+  duk_put_prop_string(_ctx, idx_top, "redisLength");
+
+  duk_push_c_function(_ctx, delete_key, 1);
+  duk_put_prop_string(_ctx, idx_top, "redisDeleteKey");
+
   duk_push_c_function(_ctx, list_push, 3);
   duk_put_prop_string(_ctx, idx_top, "redisListPush");
   
@@ -52,6 +58,44 @@ duk_ret_t select_db(duk_context *_ctx){
   RedisModule_SelectDb(RM_ctx, newid);
   return 0;
 }
+
+duk_ret_t length(duk_context *_ctx){
+  const char * key = duk_require_string(_ctx, 0); // key name
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  size_t ret = RedisModule_ValueLength(key_h);
+  RedisModule_CloseKey(key_h);
+  duk_push_number(_ctx, ret);
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  return 1;
+}
+
+duk_ret_t delete_key(duk_context *_ctx){
+  const char * key = duk_require_string(_ctx, 0); // key name
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  RedisModule_DeleteKey(key_h);
+  RedisModule_CloseKey(key_h);
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  return 0;
+}
+
+duk_ret_t get_expire(duk_context *_ctx){
+
+}
+
+duk_ret_t set_expire(duk_context *_ctx){
+
+}
+
+duk_ret_t string_set(duk_context *_ctx){
+
+}
+
+duk_ret_t string_truncate(duk_context *_ctx){
+
+}
+
 
 duk_ret_t list_push(duk_context *_ctx) {
 
