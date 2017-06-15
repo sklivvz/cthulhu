@@ -33,8 +33,12 @@ duk_ret_t list_pop(duk_context *_ctx);
 // duk_ret_t zset_range_current_element(duk_context *_ctx);
 // duk_ret_t zset_range_next(duk_context *_ctx);
 // duk_ret_t zset_range_prev(duk_context *_ctx);
-// duk_ret_t hash_set(duk_context *_ctx);
-// duk_ret_t hash_get(duk_context *_ctx);
+duk_ret_t hash_set(duk_context *_ctx);
+duk_ret_t hash_set_if_present(duk_context *_ctx);
+duk_ret_t hash_set_if_absent(duk_context *_ctx);
+duk_ret_t hash_unset(duk_context *_ctx);
+duk_ret_t hash_is_set(duk_context *_ctx);
+duk_ret_t hash_get(duk_context *_ctx);
 duk_ret_t log_to_redis(duk_context *_ctx);
 
 int load_file_to_context(duk_context *_ctx, const char *filename);

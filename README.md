@@ -45,8 +45,12 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [ ] zset_range_current_element
  * [ ] zset_range_next
  * [ ] zset_range_prev
- * [ ] hash_set
- * [ ] hash_get
+ * [x] hash_set
+ * [x] hash_set_if_present
+ * [x] hash_set_if_absent
+ * [x] hash_unset
+ * [x] hash_is_set
+ * [x] hash_get
  * [x] log
 
  They are documented in the [Redis Module API page](https://github.com/antirez/redis/blob/unstable/src/modules/API.md)

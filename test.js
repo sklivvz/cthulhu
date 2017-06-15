@@ -20,6 +20,12 @@ function theOldOne ( name ) {
     redisLog("warning", "redisStringSet: " + redisStringSet("R'lyeh", "The nightmare corpse-city of R'lyeh…was built in measureless eons behind history by the vast, loathsome shapes that seeped down from the dark stars."));
     redisLog("warning", "redisStringTruncate: " + redisStringTruncate("R'lyeh", 13));
     redisLog("warning", "redisStringSet: " + redisStringGet("R'lyeh"));
+    redisLog("warning", "redisHashSet: " + redisHashSet("azathoth", "chaos", "blind"));
+    redisLog("warning", "redisHashSetIfAbsent: " + redisHashSetIfAbsent("azathoth", "chaos", "idiot"));
+    redisLog("warning", "redisHashSetIfPresent: " + redisHashSetIfPresent("azathoth", "chaos", "god"));
+    redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "chaos"));
+   // redisLog("warning", "redisHashUnset: " + redisHashUnset("azathoth", "chaos"));
+    redisLog("warning", "redisHashIsSet: " + redisHashIsSet("azathoth", "chaos"));
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";
