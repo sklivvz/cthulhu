@@ -310,12 +310,8 @@ duk_ret_t hash_is_set(duk_context *_ctx){
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   int exists;
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
-printf("hash %s\n", key);
-printf("key %s\n", hashkey);
 
   int ret = RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS | REDISMODULE_HASH_EXISTS, hashkey, &exists, NULL);
-
-printf("exists %d - ret %d", exists, ret);
 
   RedisModule_CloseKey(key_h);
   duk_pop(_ctx);
