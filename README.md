@@ -57,10 +57,11 @@ This are the `RedisModule` APIs that are planned for version 0.1:
 
 ### Roadmap
 
+* create an actual JavaScript API and not simply global methods
+* blocking calls/background processing
 * functions with variable argument number
 * return type to redis should be specific and not string
 * support for generic LUA style calls
-* create an actual JavaScript API and not simply global methods
 
  ## Version
 

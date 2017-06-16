@@ -311,13 +311,14 @@ duk_ret_t hash_is_set(duk_context *_ctx){
   int exists;
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
 
-  int ret = RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS | REDISMODULE_HASH_EXISTS, hashkey, &exists, NULL);
+  if (key_h == NULL) {
+    exists = 0;
+  } else {
+    RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS | REDISMODULE_HASH_EXISTS, hashkey, &exists, NULL);
+    RedisModule_CloseKey(key_h);
+  }
 
-  RedisModule_CloseKey(key_h);
   duk_pop(_ctx);
-
-  size_t len;
-
   duk_push_boolean(_ctx, exists);
   return 1;
 }
@@ -329,16 +330,19 @@ duk_ret_t hash_get(duk_context *_ctx){
   RedisModuleString *RMS_HashValue;
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
 
-  int ret = RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS, hashkey, &RMS_HashValue, NULL);
-
-  RedisModule_CloseKey(key_h);
-  duk_pop(_ctx);
-
-  size_t len;
-  duk_push_string(_ctx, RedisModule_StringPtrLen(RMS_HashValue, &len));
+  if (key_h == NULL) {
+    duk_pop(_ctx);
+    duk_push_string(_ctx, NULL);
+  } else {
+    size_t len;
+    RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS, hashkey, &RMS_HashValue, NULL);
+    RedisModule_CloseKey(key_h);
+    duk_pop(_ctx);
+    duk_push_string(_ctx, RedisModule_StringPtrLen(RMS_HashValue, &len));
+    RedisModule_FreeString(RM_ctx, RMS_HashValue);
+  }
 
   RedisModule_FreeString(RM_ctx, RMS_Key);
-  RedisModule_FreeString(RM_ctx, RMS_HashValue);
 
   return 1;
 }

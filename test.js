@@ -24,8 +24,9 @@ function theOldOne ( name ) {
     redisLog("warning", "redisHashSetIfAbsent: " + redisHashSetIfAbsent("azathoth", "chaos", "idiot"));
     redisLog("warning", "redisHashSetIfPresent: " + redisHashSetIfPresent("azathoth", "chaos", "god"));
     redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "chaos"));
-   // redisLog("warning", "redisHashUnset: " + redisHashUnset("azathoth", "chaos"));
+    redisLog("warning", "redisHashUnset: " + redisHashUnset("azathoth", "chaos"));
     redisLog("warning", "redisHashIsSet: " + redisHashIsSet("azathoth", "chaos"));
+    redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "fear"));
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";
