@@ -15,9 +15,9 @@ Issue reports and feature requests by corageous hackers are welcome. Please don'
 
 You can load the module with the following [Redis call](https://github.com/antirez/redis/blob/unstable/src/modules/INTRO.md#loading-modules) (or you can use the loadmodule configuration directive):
 
-~~~redis
+```redis
 MODULE LOAD /path/to/cthulhu.so /path/to/your/javascript.js
-~~~
+```
 
 This will load and compile your JavaScript file. All the global functions you expose will be callable by any Redis client.
 
