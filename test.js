@@ -22,11 +22,16 @@ function theOldOne ( name ) {
     redisLog("warning", "redisStringSet: " + redisStringGet("R'lyeh"));
     redisLog("warning", "redisHashSet: " + redisHashSet("azathoth", "chaos", "blind"));
     redisLog("warning", "redisHashSetIfAbsent: " + redisHashSetIfAbsent("azathoth", "chaos", "idiot"));
-    redisLog("warning", "redisHashSetIfPresent: " + redisHashSetIfPresent("azathoth", "chaos", "god"));
+    redisLog("warning", "redisHashUpdateIfPresent: " + redisHashUpdateIfPresent("azathoth", "chaos", "god"));
     redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "chaos"));
     redisLog("warning", "redisHashUnset: " + redisHashUnset("azathoth", "chaos"));
     redisLog("warning", "redisHashIsSet: " + redisHashIsSet("azathoth", "chaos"));
     redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "fear"));
+
+    redisLog("warning", "redisZsetAdd: " + redisZsetAdd("nyarlathotep", 1.02, "atheron"));
+    redisLog("warning", "redisZsetAddIfAbsent: " + redisZsetAddIfAbsent("nyarlathotep", 1.04, "atheron"));
+    redisLog("warning", "redisZsetUpdateIfPresent: " + redisZsetUpdateIfPresent("nyarlathotep", 1.04, "atheron"));
+
 
     return "Hi " + name + ". In JavaScript land it's " + 
         new Date() + "\nYou invoked the old one " + count++ + " times.\n";

@@ -49,11 +49,20 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, list_pop, 2);
   duk_put_prop_string(_ctx, idx_top, "redisListPop");
 
+  duk_push_c_function(_ctx, zset_add, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetAdd");
+
+  duk_push_c_function(_ctx, zset_update_if_present, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetUpdateIfPresent");
+
+  duk_push_c_function(_ctx, zset_add_if_absent, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetAddIfAbsent");
+
   duk_push_c_function(_ctx, hash_set, 3);
   duk_put_prop_string(_ctx, idx_top, "redisHashSet");
 
-  duk_push_c_function(_ctx, hash_set_if_present, 3);
-  duk_put_prop_string(_ctx, idx_top, "redisHashSetIfPresent");
+  duk_push_c_function(_ctx, hash_update_if_present, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisHashUpdateIfPresent");
 
   duk_push_c_function(_ctx, hash_set_if_absent, 3);
   duk_put_prop_string(_ctx, idx_top, "redisHashSetIfAbsent");
@@ -90,7 +99,7 @@ duk_ret_t select_db(duk_context *_ctx){
   int newid = duk_require_int(_ctx, 0);
   int ret = RedisModule_SelectDb(RM_ctx, newid);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -113,7 +122,7 @@ duk_ret_t delete_key(duk_context *_ctx){
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -137,7 +146,7 @@ duk_ret_t set_expire(duk_context *_ctx){
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -153,7 +162,7 @@ duk_ret_t string_set(duk_context *_ctx){
   RedisModule_FreeString(RM_ctx, RMS_Key);
   RedisModule_FreeString(RM_ctx, RMS_Value);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -166,7 +175,7 @@ duk_ret_t string_truncate(duk_context *_ctx){
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -202,7 +211,7 @@ duk_ret_t list_push(duk_context *_ctx) {
   RedisModule_FreeString(RM_ctx, RMS_Key);
   RedisModule_FreeString(RM_ctx, RMS_Value);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -228,6 +237,82 @@ duk_ret_t list_pop(duk_context *_ctx) {
   return 1;
 }
 
+duk_ret_t zset_add(duk_context *_ctx) {
+  int flags;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetAdd(key_h, score, RMS_Value, &flags);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
+  return 1;
+}
+duk_ret_t zset_update_if_present(duk_context *_ctx) {
+  int flags = REDISMODULE_ZADD_XX;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetAdd(key_h, score, RMS_Value, &flags);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  duk_push_boolean(_ctx, (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP));
+  return 1;
+}
+duk_ret_t zset_add_if_absent(duk_context *_ctx) {
+  int flags = REDISMODULE_ZADD_NX;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetAdd(key_h, score, RMS_Value, &flags);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  duk_push_boolean(_ctx, (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP));
+  return 1;
+}
+duk_ret_t zset_incrby(duk_context *_ctx){}
+duk_ret_t zset_rem(duk_context *_ctx){}
+duk_ret_t zset_score(duk_context *_ctx){}
+duk_ret_t zset_range_stop(duk_context *_ctx){}
+duk_ret_t zset_range_end_reached(duk_context *_ctx){}
+duk_ret_t zset_first_in_score_range(duk_context *_ctx){}
+duk_ret_t zset_last_in_score_range(duk_context *_ctx){}
+duk_ret_t zset_first_in_lex_range(duk_context *_ctx){}
+duk_ret_t zset_last_in_lex_range(duk_context *_ctx){}
+duk_ret_t zset_range_current_element(duk_context *_ctx){}
+duk_ret_t zset_range_next(duk_context *_ctx){}
+duk_ret_t zset_range_prev(duk_context *_ctx){}
+
 duk_ret_t hash_set(duk_context *_ctx){
   const char * key = duk_require_string(_ctx, 0); // key name
   const char * hashkey = duk_to_string(_ctx, 1); // hash key
@@ -244,7 +329,7 @@ duk_ret_t hash_set(duk_context *_ctx){
   RedisModule_FreeString(RM_ctx, RMS_HashValue);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -264,11 +349,11 @@ duk_ret_t hash_set_if_absent(duk_context *_ctx){
   RedisModule_FreeString(RM_ctx, RMS_HashValue);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
-duk_ret_t hash_set_if_present(duk_context *_ctx){
+duk_ret_t hash_update_if_present(duk_context *_ctx){
   const char * key = duk_require_string(_ctx, 0); // key name
   const char * hashkey = duk_to_string(_ctx, 1); // hash key
   const char * hashvalue = duk_to_string(_ctx, 2); // hash value
@@ -284,7 +369,7 @@ duk_ret_t hash_set_if_present(duk_context *_ctx){
   RedisModule_FreeString(RM_ctx, RMS_HashValue);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
@@ -300,7 +385,7 @@ duk_ret_t hash_unset(duk_context *_ctx){
   duk_pop(_ctx);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK ? 1 : 0);
+  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
 
