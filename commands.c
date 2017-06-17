@@ -116,6 +116,11 @@ duk_ret_t length(duk_context *_ctx){
   const char * key = duk_require_string(_ctx, 0); // key name
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
+  if (key_h == NULL) {
+    duk_push_undefined(_ctx);
+    RedisModule_FreeString(RM_ctx, RMS_Key);
+    return 1;
+  } 
   size_t ret = RedisModule_ValueLength(key_h);
   RedisModule_CloseKey(key_h);
   duk_push_number(_ctx, ret);
@@ -138,7 +143,14 @@ duk_ret_t delete_key(duk_context *_ctx){
 duk_ret_t get_expire(duk_context *_ctx){
   const char * key = duk_require_string(_ctx, 0); // key name
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
+  if (key_h == NULL) {
+    duk_push_undefined(_ctx);
+    RedisModule_FreeString(RM_ctx, RMS_Key);
+    return 1;
+  } 
+
   mstime_t ret = RedisModule_GetExpire(key_h);
   RedisModule_CloseKey(key_h);
   duk_push_number(_ctx, ret);
@@ -193,6 +205,12 @@ duk_ret_t string_get(duk_context *ctx) {
   const char * key = duk_require_string(_ctx, 0); // key name
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
+  if (key_h == NULL) {
+    duk_push_undefined(_ctx);
+    RedisModule_FreeString(RM_ctx, RMS_Key);
+    return 1;
+  } 
+
   char *result = RedisModule_StringDMA(key_h, &len, REDISMODULE_READ);
   RedisModule_CloseKey(key_h);
   duk_push_string(_ctx, result);
@@ -200,7 +218,6 @@ duk_ret_t string_get(duk_context *ctx) {
 
   return 1;
 }
-
 
 duk_ret_t list_push(duk_context *_ctx) {
   const char * key = duk_require_string(_ctx, 0); // key name
@@ -267,6 +284,7 @@ duk_ret_t zset_add(duk_context *_ctx) {
   duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
 }
+
 duk_ret_t zset_update_if_present(duk_context *_ctx) {
   int flags = REDISMODULE_ZADD_XX;
   const char * key = duk_require_string(_ctx, 0); // key name
@@ -288,6 +306,7 @@ duk_ret_t zset_update_if_present(duk_context *_ctx) {
   duk_push_boolean(_ctx, (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP));
   return 1;
 }
+
 duk_ret_t zset_add_if_absent(duk_context *_ctx) {
   int flags = REDISMODULE_ZADD_NX;
   const char * key = duk_require_string(_ctx, 0); // key name
@@ -486,14 +505,17 @@ duk_ret_t hash_is_set(duk_context *_ctx){
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
 
   if (key_h == NULL) {
-    exists = 0;
-  } else {
-    RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS | REDISMODULE_HASH_EXISTS, hashkey, &exists, NULL);
-    RedisModule_CloseKey(key_h);
+    duk_pop(_ctx);
+    duk_push_undefined(_ctx);
+    RedisModule_FreeString(RM_ctx, RMS_Key);
+    return 1;
   }
 
+  RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS | REDISMODULE_HASH_EXISTS, hashkey, &exists, NULL);
+  RedisModule_CloseKey(key_h);
   duk_pop(_ctx);
   duk_push_boolean(_ctx, exists);
+  RedisModule_FreeString(RM_ctx, RMS_Key);
   return 1;
 }
 
@@ -502,20 +524,21 @@ duk_ret_t hash_get(duk_context *_ctx){
   const char * hashkey = duk_to_string(_ctx, 1); // hash key
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   RedisModuleString *RMS_HashValue;
-  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
 
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_READ);
   if (key_h == NULL) {
     duk_pop(_ctx);
-    duk_push_string(_ctx, NULL);
-  } else {
-    size_t len;
-    RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS, hashkey, &RMS_HashValue, NULL);
-    RedisModule_CloseKey(key_h);
-    duk_pop(_ctx);
-    duk_push_string(_ctx, RedisModule_StringPtrLen(RMS_HashValue, &len));
-    RedisModule_FreeString(RM_ctx, RMS_HashValue);
+    duk_push_undefined(_ctx);
+    RedisModule_FreeString(RM_ctx, RMS_Key);
+    return 1;
   }
 
+  size_t len;
+  RedisModule_HashGet(key_h, REDISMODULE_HASH_CFIELDS, hashkey, &RMS_HashValue, NULL);
+  RedisModule_CloseKey(key_h);
+  duk_pop(_ctx);
+  duk_push_string(_ctx, RedisModule_StringPtrLen(RMS_HashValue, &len));
+  RedisModule_FreeString(RM_ctx, RMS_HashValue);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
   return 1;
