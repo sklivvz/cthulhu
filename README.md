@@ -9,7 +9,7 @@ The JavaScript commands are precompiled, can access the Redis API at a low level
 
 This module depends on Redis 4.0, which is still unstable software and a pending patch. Being alpha itself, API compatibility is not yet guaranteed.
 
-Issue reports and feature requests by corageous hackers are welcome. Please don't send patches just yet. Our roadmap is [here](https://github.com/sklivvz/cthulhu/docs/API.md).
+Issue reports and feature requests by corageous hackers are welcome. Please don't send patches just yet. Our roadmap is [here](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md).
 
 ## Basic Usage
 
@@ -25,11 +25,11 @@ The module can be unloaded like any other (see the [docs](https://github.com/ant
 
 ## Getting Started
 
-For a quick introduction, please follow the instructions in our [intro](https://github.com/sklivvz/cthulhu/docs/intro.md) document.
+For a quick introduction, please follow the instructions in our [intro](https://github.com/sklivvz/cthulhu/blob/master/docs/intro.md) document.
 
-To build the module from source, the instructions are in our [build](https://github.com/sklivvz/cthulhu/docs/build.md) page.
+To build the module from source, the instructions are in our [build](https://github.com/sklivvz/cthulhu/blob/master/docs/build.md) page.
 
-The full documentation of the Redis API, inclding the updated implementation status is in our [API](https://github.com/sklivvz/cthulhu/docs/API.md) doc.
+The full documentation of the Redis API, inclding the updated implementation status is in our [API](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md) doc.
 
  ## Version
 
