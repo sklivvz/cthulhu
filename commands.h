@@ -24,6 +24,8 @@ duk_ret_t zset_add(duk_context *_ctx);
 duk_ret_t zset_add_if_absent(duk_context *_ctx);
 duk_ret_t zset_update_if_present(duk_context *_ctx);
 duk_ret_t zset_incrby(duk_context *_ctx);
+duk_ret_t zset_incrby_if_absent(duk_context *_ctx);
+duk_ret_t zset_incrby_if_present(duk_context *_ctx);
 duk_ret_t zset_rem(duk_context *_ctx);
 duk_ret_t zset_score(duk_context *_ctx);
 duk_ret_t zset_range_stop(duk_context *_ctx);

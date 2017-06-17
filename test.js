@@ -27,10 +27,12 @@ function theOldOne ( name ) {
     redisLog("warning", "redisHashUnset: " + redisHashUnset("azathoth", "chaos"));
     redisLog("warning", "redisHashIsSet: " + redisHashIsSet("azathoth", "chaos"));
     redisLog("warning", "redisHashGet: " + redisHashGet("azathoth", "fear"));
-
     redisLog("warning", "redisZsetAdd: " + redisZsetAdd("nyarlathotep", 1.02, "atheron"));
     redisLog("warning", "redisZsetAddIfAbsent: " + redisZsetAddIfAbsent("nyarlathotep", 1.04, "atheron"));
     redisLog("warning", "redisZsetUpdateIfPresent: " + redisZsetUpdateIfPresent("nyarlathotep", 1.04, "atheron"));
+    redisLog("warning", "redisZsetIncrby: " + redisZsetIncrby("nyarlathotep", 0.96, "atheron"));
+    redisLog("warning", "redisZsetIncrbyIfAbsent: " + redisZsetIncrbyIfAbsent("nyarlathotep", 1.04, "atheron"));
+    redisLog("warning", "redisZsetIncrbyIfPresent: " + redisZsetIncrbyIfPresent("nyarlathotep", 1.0, "atheron"));
 
 
     return "Hi " + name + ". In JavaScript land it's " + 

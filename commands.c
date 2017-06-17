@@ -58,6 +58,15 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, zset_add_if_absent, 3);
   duk_put_prop_string(_ctx, idx_top, "redisZsetAddIfAbsent");
 
+  duk_push_c_function(_ctx, zset_incrby, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetIncrby");
+
+  duk_push_c_function(_ctx, zset_incrby_if_present, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetIncrbyIfPresent");
+
+  duk_push_c_function(_ctx, zset_incrby_if_absent, 3);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetIncrbyIfAbsent");
+  
   duk_push_c_function(_ctx, hash_set, 3);
   duk_put_prop_string(_ctx, idx_top, "redisHashSet");
 
@@ -300,7 +309,87 @@ duk_ret_t zset_add_if_absent(duk_context *_ctx) {
   duk_push_boolean(_ctx, (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP));
   return 1;
 }
-duk_ret_t zset_incrby(duk_context *_ctx){}
+
+duk_ret_t zset_incrby(duk_context *_ctx) {
+  int flags;
+  double newScore;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetIncrby(key_h, score, RMS_Value, &flags, &newScore);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  if (ret == REDISMODULE_OK) {
+    duk_push_number(_ctx, newScore);
+  } else {
+    duk_push_undefined(_ctx);
+  }
+  return 1;
+}
+
+duk_ret_t zset_incrby_if_present(duk_context *_ctx) {
+  int flags = REDISMODULE_ZADD_XX;
+  double newScore;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetIncrby(key_h, score, RMS_Value, &flags, &newScore);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+  if (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP) {
+    duk_push_number(_ctx, newScore);
+  } else {
+    duk_push_undefined(_ctx);
+  }
+  return 1;
+}
+
+duk_ret_t zset_incrby_if_absent(duk_context *_ctx) {
+  int flags = REDISMODULE_ZADD_NX;
+  double newScore;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  duk_double_t score = duk_require_number(_ctx, 1); // score
+  const char * value = duk_to_string(_ctx, 2); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetIncrby(key_h, score, RMS_Value, &flags, &newScore);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  if (ret == REDISMODULE_OK && flags != REDISMODULE_ZADD_NOP) {
+    duk_push_number(_ctx, newScore);
+  } else {
+    duk_push_undefined(_ctx);
+  }
+  return 1;
+}
+
 duk_ret_t zset_rem(duk_context *_ctx){}
 duk_ret_t zset_score(duk_context *_ctx){}
 duk_ret_t zset_range_stop(duk_context *_ctx){}
