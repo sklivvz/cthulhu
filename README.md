@@ -33,7 +33,11 @@ This are the `RedisModule` APIs that are planned for version 0.1:
  * [x] list_push
  * [x] list_pop
  * [x] zset_add
+ * [x] zset_update_if_present
+ * [x] zset_add_if_absent
  * [x] zset_incrby
+ * [x] zset_incrby_if_present
+ * [x] zset_incrby_if_absent
  * [x] zset_rem
  * [x] zset_score
  * [ ] zset_range_stop
