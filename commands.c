@@ -1,11 +1,5 @@
 #include "commands.h"
 
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <unistd.h>
-//#include <errno.h>
-//#include <string.h>
-
 void register_commands(duk_context *_ctx) {
   duk_push_global_object(_ctx);
   duk_idx_t idx_top = duk_get_top_index(_ctx);
@@ -67,6 +61,9 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, zset_incrby_if_absent, 3);
   duk_put_prop_string(_ctx, idx_top, "redisZsetIncrbyIfAbsent");
   
+  duk_push_c_function(_ctx, zset_rem, 2);
+  duk_put_prop_string(_ctx, idx_top, "redisZsetRem");
+
   duk_push_c_function(_ctx, hash_set, 3);
   duk_put_prop_string(_ctx, idx_top, "redisHashSet");
 
@@ -409,7 +406,30 @@ duk_ret_t zset_incrby_if_absent(duk_context *_ctx) {
   return 1;
 }
 
-duk_ret_t zset_rem(duk_context *_ctx){}
+duk_ret_t zset_rem(duk_context *_ctx) {
+  int deleted;
+  const char * key = duk_require_string(_ctx, 0); // key name
+  const char * value = duk_to_string(_ctx, 1); // ele
+
+  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
+  RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
+
+  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
+  int ret = RedisModule_ZsetRem(key_h, RMS_Value, &deleted);
+  RedisModule_CloseKey(key_h);
+
+  duk_pop(_ctx);
+
+  RedisModule_FreeString(RM_ctx, RMS_Key);
+  RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  if (ret == REDISMODULE_OK) {
+    duk_push_boolean(_ctx, deleted);
+  } else {
+    duk_push_undefined(_ctx);
+  }
+  return 1;}
+
 duk_ret_t zset_score(duk_context *_ctx){}
 duk_ret_t zset_range_stop(duk_context *_ctx){}
 duk_ret_t zset_range_end_reached(duk_context *_ctx){}

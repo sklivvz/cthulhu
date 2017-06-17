@@ -33,6 +33,8 @@ function theOldOne ( name ) {
     redisLog("warning", "redisZsetIncrby: " + redisZsetIncrby("nyarlathotep", 0.96, "atheron"));
     redisLog("warning", "redisZsetIncrbyIfAbsent: " + redisZsetIncrbyIfAbsent("nyarlathotep", 1.04, "atheron"));
     redisLog("warning", "redisZsetIncrbyIfPresent: " + redisZsetIncrbyIfPresent("nyarlathotep", 1.0, "atheron"));
+    redisLog("warning", "redisZsetRem: " + redisZsetRem("nyarlathotep", "atheron"));
+    redisLog("warning", "redisZsetRem: " + redisZsetRem("nyarlathotep", "atheron"));
 
 
     return "Hi " + name + ". In JavaScript land it's " + 
