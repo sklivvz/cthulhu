@@ -1,6 +1,12 @@
+# JavaScript API
+
+A series of JavaScript classes are available to call Redis. Documentation to follow.
+
 # Redis API
 
-In version 0.1 I will be exposing the following `RedisModule` API in the global javascript object. The checked boxes mark what is implemented.
+There is also a lower level API. This will be subject to change until further notice.
+
+The following `RedisModule` API in are exposed the global javascript object. The checked boxes mark what is implemented.
 
  * [x] redisMilliseconds()
  * [x] redisGetClientId()
