@@ -9,7 +9,7 @@ The most basic program you can run will just print "Hello world!" to the log whe
 Create the following JavaScript file and call it `hello.js`:
 
 ```javascript
-redisLog("warning", "Hello world!");
+Redis.warn("Hello world!");
 ```
 
 Now start your custom Redis server and connect via a client (one is conveniently compiled along with the server):
@@ -46,7 +46,7 @@ Let's try to actually export a function this time. Change your `hello.js` to rea
 
 ```javascript
 function hello(name) {
-    redisLog("warning", "Hello " + name + "!" );
+    Redis.warn("Hello " + name + "!" );
 }
 ```
 

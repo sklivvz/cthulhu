@@ -29,15 +29,15 @@ The following `RedisModule` API in are exposed the global javascript object. The
  * [x] redisZsetIncrbyIfAbsent( key, amount, element )
  * [x] redisZsetRem( key, element )
  * [x] redisZsetScore( key, element )
- * [ ] redisZsetRangeStop
- * [ ] redisZsetRangeEndReached
- * [ ] redisZsetFirstInScoreRange
- * [ ] redisZsetLastInScoreRange
- * [ ] redisZsetFirstInLexRange
- * [ ] redisZsetLastInLexRange
- * [ ] redisZsetRangeCurrentElement
- * [ ] redisZsetRangeNext
- * [ ] redisZsetRangePrev
+ * [x] redisZsetRangeStop( handle )
+ * [x] redisZsetRangeEndReached( handle )
+ * [x] redisZsetFirstInScoreRange( key, min, max, mininc, maxinc )
+ * [x] redisZsetLastInScoreRange( key, min, max, mininc, maxinc )
+ * [x] redisZsetFirstInLexRange( key, min, max )
+ * [x] redisZsetLastInLexRange( key, min, max )
+ * [x] redisZsetRangeCurrentElement( handle )
+ * [x] redisZsetRangeNext( handle )
+ * [x] redisZsetRangePrev( handle )
  * [x] redisHashSet( key, hashKey, hashValue )
  * [x] redisHashSetIfPresent( key, hashKey, hashValue )
  * [x] redisHashSetIfAbsent( key, hashKey, hashValue )

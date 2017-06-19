@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <libgen.h>
 
 duk_context *_ctx;
 RedisModuleCtx *RM_ctx;
@@ -66,6 +67,20 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   }
 
   register_commands(_ctx);
+
+  char * js = strcpy(malloc(strlen(filename)+1), filename);
+  js = dirname(js);
+  strcat(js,"/cthulhu.js");
+  if (load_file_to_context(_ctx, js)<0) {
+    free(js);
+    return REDISMODULE_ERR;
+  }
+  free(js);
+
+  if (duk_peval(_ctx) != 0) {
+    printf("Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
+    return REDISMODULE_ERR;
+  }
 
   if (load_file_to_context(_ctx, filename)<0) return REDISMODULE_ERR;
 

@@ -33,7 +33,7 @@ The full documentation of the Redis API, inclding the updated implementation sta
 
  ## Version
 
- The current version is pre-0.1.
+ The current version is 0.2.
 
  ## License
 
