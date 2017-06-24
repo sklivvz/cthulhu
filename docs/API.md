@@ -66,6 +66,22 @@ Adds the passed `message` to the redis log with a log level of `error`.
 
 # Redis.Hash
 This class encapsulates a redis hash object.
+
+``` javascript
+var azathoth = new Redis.Hash("Azathoth");
+
+azathoth.upsert("chaos", "blind"));
+azathoth.insert("chaos", "idiot")); // fails, returns false
+
+Redis.warn("Redis.Hash.length: " + azathoth.length());        // logs 1
+
+azathoth.update("chaos", "god"));
+Redis.warn("Redis.Hash.lookup: " + azathoth.lookup("chaos")); // logs "god"
+
+azathoth.remove("chaos"));
+Redis.warn("Redis.Hash.exists: " + azathoth.exists("chaos")); // logs false
+```
+
 ## Redis.Hash( key )
 Creates a new instance of `Redis.Hash` bound to the specified Redis key. This will not 
 create a corresponding Redis hash if it is not present in the database.
@@ -95,6 +111,21 @@ Returns `true` if an element specified by `key` exists, `false` if it does not, 
 # Redis.List
 A `Redis.List` object encapsulates a Redis list. It has stack-like and queue-like APIs, with semantics similar to JavaScript.
 
+```javascript
+var cthulhu = new Redis.List("Cthulhu");
+cthulhu.push(1);
+cthulhu.push([2,3]);
+
+Redis.warn("Redis.List.pop(): "+ cthulhu.pop());      // logs 3
+
+Redis.warn("Redis.List.shift(): "+ cthulhu.shift());  // logs 1
+
+cthulhu.unshift([4,5,6]);
+cthulhu.unshift(7);
+
+Redis.warn("Redis.List.length: " + cthulhu.length()); // logs 5
+```
+
 ## Redis.List( key )
 Creates a new instance of `Redis.List` bound to the specified Redis key. This will not 
 create a corresponding Redis list if it is not present in the database.
@@ -118,7 +149,24 @@ Adds `value` at the end of the list and returns `true` if succesful. If `value` 
 ---
 
 # Redis.SortedSet
-This class represents a Redis `ZSET` class, a sorted set.
+This class represents a Redis zset class, a sorted set.
+
+```javascript
+var nyarlathotep = new Redis.SortedSet("Nyarlathotep");
+
+nyarlathotep.upsert("atheron", 1.02));
+nyarlathotep.insert("atheron", 1.04)); // fails, returns false
+nyarlathotep.update("atheron", 1.04));
+nyarlathotep.insinc("atheron", 0.96));
+nyarlathotep.incrby("atheron", 1.0));
+
+Redis.warn("Redis.SortedSet.length: " + nyarlathotep.length());         // logs 1
+Redis.warn("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs 3
+
+nyarlathotep.remove("atheron"));
+Redis.warn("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs undefined
+```
+
 ## Redis.SortedSet( key )
 Creates a new instance of `Redis.SortedSet` bound to the specified Redis key. This will not 
 create a corresponding Redis sorted set if it is not present in the database.
@@ -158,6 +206,17 @@ Returns a `Redis.SortedSet.Range` object to navigate the elements of a sorted se
 
 # Redis.SortedSet.Range
 This class allows navingating Redis sorted sets in an easy way. This class should not be constructed by client code, it is returned by `Redis.SortedSet.getRange()`.
+```javascript
+var nyarlathotep = new Redis.SortedSet("Nyarlathotep");
+
+for(var i = 0; i<100; i++) {
+    nyarlathotep.upsert("atheron "+i, Math.sqrt(i));
+}
+
+var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
+range.each(function(elem){Redis.warn("iterating ["+elem.key+"], "+elem.score);})
+range.stop();
+```
 ## Redis.SortedSet.Range.current()
 Returns the current range element as a tuple of the form `{ key, score }`.
 ## Redis.SortedSet.Range.previous()
@@ -168,14 +227,9 @@ Moves the current range element *forward* by one element.
 Returns `true` if the sorted set has more elements to move next to.
 ## Redis.SortedSet.Range.each( func )
 Executed the specified function `func` for each element in the set, passing each item of the range to it.
-
-```javascript
-var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
-range.each(function(elem){Redis.warn("iterating ["+elem.key+"], "+elem.score);})
-range.stop();
-```
 ## Redis.SortedSet.Range.stop()
 Terminates the current iteration. If the range is not completely enumerated you *MUST* call this method to free the corresponding key in Redis.
+
 ---
 
 # Redis.String
