@@ -64,10 +64,8 @@ Adds the passed `message` to the redis log with a log level of `error`.
 
 ---
 
-##Redis.Hash
-This class encapsulated a redis hash object.
 # Redis.Hash
-This class represents a Redis `HASH` class, a hash table.
+This class encapsulates a redis hash object.
 ## Redis.Hash( key )
 Creates a new instance of `Redis.Hash` bound to the specified Redis key. This will not 
 create a corresponding Redis hash if it is not present in the database.
