@@ -1,38 +1,28 @@
+var calc = new Redis.List("calc");
+
 function c(input) {
     switch(input)
     {
         case "+":
-            var first = redisListPop("calc", true)|0;
-            var second = redisListPop("calc", true)|0;
-            var result = first + second;
-            redisListPush("calc", true, result);
-            return redisLength("calc");
+            calc.push(calc.pop()+calc.pop());
+            return calc.length();
         case "-":
-            var first = redisListPop("calc", true)|0;
-            var second = redisListPop("calc", true)|0;
-            var result = first - second;
-            redisListPush("calc", true, result);
-            return redisLength("calc");
+            calc.push(calc.pop()-calc.pop());
+            return calc.length();
         case "*":
-            var first = redisListPop("calc", true)|0;
-            var second = redisListPop("calc", true)|0;
-            var result = first * second;
-            redisListPush("calc", true, result);
-            return redisLength("calc");
+            calc.push(calc.pop()*calc.pop());
+            return calc.length();
         case "/":
-            var first = redisListPop("calc", true)|0;
-            var second = redisListPop("calc", true)|0;
-            var result = second/first;
-            redisListPush("calc", true, result);
-            return redisLength("calc");
+            calc.push(1/calc.pop()*calc.pop());
+            return calc.length();
         case "=":
-            return redisListPop("calc", true)|0;
+            return calc.pop()|0;
         case "c":
         case "C":
-            redisDeleteKey("calc");
-            return redisLength("calc");
+            calc.delete();
+            return 0;
         default:
-            redisListPush("calc", true, input);
-            return redisLength("calc");
+            calc.push(input);
+            return calc.length();
     }
 }

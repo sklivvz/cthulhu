@@ -107,7 +107,7 @@ function test() {
         nyarlathotep.upsert("atheron "+i, Math.sqrt(i));
     }
     var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
-    range.each(function(elem){Redis.warn("iterating ["+elem.value+"], "+elem.score);})
+    range.each(function(elem){Redis.warn("iterating ["+elem.key+"], "+elem.score);})
     range.stop();
     
 

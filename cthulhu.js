@@ -76,7 +76,7 @@ Redis.SortedSet = function(name) {
     Range = function(key,config){
         this.config = {};
         this.config.reverse = config.reverse || false;
-        this.config.score = !config.score || true;
+        this.config.score = config.score === false ? false : true;
         this.config.min = config.min || undefined;
         this.config.max = config.max || undefined;
         if (this.config.score) {

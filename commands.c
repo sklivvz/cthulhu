@@ -596,7 +596,7 @@ duk_ret_t zset_range_current_element(duk_context *_ctx) {
   duk_put_prop_string(_ctx, obj_idx, "score");
   size_t len;
   duk_push_string(_ctx, RedisModule_StringPtrLen(value,&len));
-  duk_put_prop_string(_ctx, obj_idx, "value");
+  duk_put_prop_string(_ctx, obj_idx, "key");
   RedisModule_FreeString(RM_ctx, value);
   return 1;
 }
