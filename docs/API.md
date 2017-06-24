@@ -55,12 +55,16 @@ do some work here on db 42
 
 Redis.setSelectedDb( oldDb );
 ```
-## Redis.Log( level, message )
+## Redis.log( level, message )
 Adds the passed `message` to the redis log with a log level of `level` (e.g. "warning").
-## Redis.Warn( message )
+## Redis.warn( message )
 Adds the passed `message` to the redis log with a log level of `warning`.
-## Redis.Error( message )
-Adds the passed `message` to the redis log with a log level of `error`.
+## Redis.notice( message )
+Adds the passed `message` to the redis log with a log level of `notice`.
+## Redis.verbose( message )
+Adds the passed `message` to the redis log with a log level of `verbose`.
+## Redis.debug( message )
+Adds the passed `message` to the redis log with a log level of `debug`.
 
 ---
 
@@ -73,13 +77,13 @@ var azathoth = new Redis.Hash("Azathoth");
 azathoth.upsert("chaos", "blind"));
 azathoth.insert("chaos", "idiot")); // fails, returns false
 
-Redis.warn("Redis.Hash.length: " + azathoth.length());        // logs 1
+Redis.notice("Redis.Hash.length: " + azathoth.length());        // logs 1
 
 azathoth.update("chaos", "god"));
-Redis.warn("Redis.Hash.lookup: " + azathoth.lookup("chaos")); // logs "god"
+Redis.notice("Redis.Hash.lookup: " + azathoth.lookup("chaos")); // logs "god"
 
 azathoth.remove("chaos"));
-Redis.warn("Redis.Hash.exists: " + azathoth.exists("chaos")); // logs false
+Redis.notice("Redis.Hash.exists: " + azathoth.exists("chaos")); // logs false
 ```
 
 ## Redis.Hash( key )
@@ -116,14 +120,14 @@ var cthulhu = new Redis.List("Cthulhu");
 cthulhu.push(1);
 cthulhu.push([2,3]);
 
-Redis.warn("Redis.List.pop(): "+ cthulhu.pop());      // logs 3
+Redis.notice("Redis.List.pop(): "+ cthulhu.pop());      // logs 3
 
-Redis.warn("Redis.List.shift(): "+ cthulhu.shift());  // logs 1
+Redis.notice("Redis.List.shift(): "+ cthulhu.shift());  // logs 1
 
 cthulhu.unshift([4,5,6]);
 cthulhu.unshift(7);
 
-Redis.warn("Redis.List.length: " + cthulhu.length()); // logs 5
+Redis.notice("Redis.List.length: " + cthulhu.length()); // logs 5
 ```
 
 ## Redis.List( key )
@@ -160,11 +164,11 @@ nyarlathotep.update("atheron", 1.04));
 nyarlathotep.insinc("atheron", 0.96));
 nyarlathotep.incrby("atheron", 1.0));
 
-Redis.warn("Redis.SortedSet.length: " + nyarlathotep.length());         // logs 1
-Redis.warn("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs 3
+Redis.notice("Redis.SortedSet.length: " + nyarlathotep.length());         // logs 1
+Redis.notice("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs 3
 
 nyarlathotep.remove("atheron"));
-Redis.warn("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs undefined
+Redis.notice("Redis.SortedSet.score: " + nyarlathotep.score("atheron"));  // logs undefined
 ```
 
 ## Redis.SortedSet( key )
@@ -214,7 +218,7 @@ for(var i = 0; i<100; i++) {
 }
 
 var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
-range.each(function(elem){Redis.warn("iterating ["+elem.key+"], "+elem.score);})
+range.each(function(elem){Redis.notice("iterating ["+elem.key+"], "+elem.score);})
 range.stop();
 ```
 ## Redis.SortedSet.Range.current()
@@ -240,14 +244,14 @@ var rlyeh = new Redis.String("R'lyeh");
 
 rlyeh.set("The nightmare corpse-city of R'lyeh…was built in measureless eons behind history by the vast," +      
           "loathsome shapes that seeped down from the dark stars.");
-Redis.warn("Redis.String.length: " + rlyeh.length());       // logs 150
+Redis.notice("Redis.String.length: " + rlyeh.length());       // logs 150
 
 rlyeh.setExpire(10000);
-Redis.warn("Redis.String.getExpire: " + rlyeh.getExpire()); // logs 10000
+Redis.notice("Redis.String.getExpire: " + rlyeh.getExpire()); // logs 10000
 
 rlyeh.truncate(13);
-Redis.warn("Redis.String.length: " + rlyeh.length());       // logs 13
-Redis.warn("Redis.String.get: " + rlyeh.get());             // logs "The Nightmare"
+Redis.notice("Redis.String.length: " + rlyeh.length());       // logs 13
+Redis.notice("Redis.String.get: " + rlyeh.get());             // logs "The Nightmare"
 
 rlyeh.delete();
 rlyeh.get();                                                // logs undefined

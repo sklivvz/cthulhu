@@ -7,7 +7,9 @@ Redis.getSelectedDb = function() { return redisGetSelectedDb(); }
 Redis.setSelectedDb = function(number) { return redisSelectDb(number); }
 Redis.log = function(logLevel,message) { return redisLog(loglevel,message); }
 Redis.warn = function(message) { return redisLog("warning",message); }
-Redis.error = function(message) { return redisLog("error",message); }
+Redis.notice = function(message) { return redisLog("notice",message); }
+Redis.verbose = function(message) { return redisLog("verbose",message); }
+Redis.debug = function(message) { return redisLog("debug",message); }
 
 // Base class with all shared object methods
 

@@ -62,7 +62,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   //TODO: see http://duktape.org/guide.html#error-handling
   _ctx = duk_create_heap_default();
   if (!_ctx) {
-    printf("Failed to create a Duktape heap.\n");
+    RedisModule_Log(ctx, "warning", "Failed to create a Duktape heap.\n");
     return REDISMODULE_ERR;
   }
 
@@ -71,6 +71,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   char * js = strcpy(malloc(strlen(filename)+1), filename);
   js = dirname(js);
   strcat(js,"/cthulhu.js");
+
+  RedisModule_Log(ctx, "notice", "Loading `%s'...", js);
   if (load_file_to_context(_ctx, js)<0) {
     free(js);
     return REDISMODULE_ERR;
@@ -78,10 +80,11 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   free(js);
 
   if (duk_peval(_ctx) != 0) {
-    printf("Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
+    RedisModule_Log(ctx, "warning", "Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
     return REDISMODULE_ERR;
   }
 
+  RedisModule_Log(ctx, "notice", "Loading `%s'...", filename);
   if (load_file_to_context(_ctx, filename)<0) return REDISMODULE_ERR;
 
   if (duk_peval(_ctx) != 0) {
