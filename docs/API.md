@@ -56,11 +56,11 @@ do some work here on db 42
 Redis.setSelectedDb( oldDb );
 ```
 ### Redis.Log( level, message )
-
+Adds the passed `message` to the redis log with a log level of `level` (e.g. "warning").
 ### Redis.Warn( message )
-
+Adds the passed `message` to the redis log with a log level of `warning`.
 ### Redis.Error( message )
-
+Adds the passed `message` to the redis log with a log level of `error`.
 ## Redis.String
 The Redis.String class encapsulates a string stored in Redis.
 
@@ -188,7 +188,7 @@ Increments the element specified by `key` by a score of `score` or inserts a new
 ### Redis.SortedSet.remove( key )
 Removes the element specified by `key` from the sorted set and returns `true`. It will return `false` if no element was removed and `undefined` if the sorted set was not found.
 ### Redis.SortedSet.score( key )
-Returns the score of the element specified by `key` or `undefined` if the sorted set was not found.## Redis.Hash
+Returns the score of the element specified by `key` or `undefined` if the sorted set was not found.
 ### Redis.SortedSet.getRange( config )
 Returns a `Redis.SortedSet.Range` object to navigate the elements of a sorted set. Config is an object with the following properties that determine the type of range wanted:
 
@@ -217,22 +217,32 @@ var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
 range.each(function(elem){Redis.warn("iterating ["+elem.key+"], "+elem.score);})
 range.stop();
 ```
-
 ### Redis.SortedSet.Range.stop
 Terminates the current iteration. If the range is not completely enumerated you *MUST* call this method to free the corresponding key in Redis.
-# Redis API
-
-There is also a lower level API. This will be subject to change until further notice.
-
-The following `RedisModule` API in are exposed the global javascript object. The checked boxes mark what is implemented.
-
-
- * [x] redisHashSet( key, hashKey, hashValue )
- * [x] redisHashSetIfPresent( key, hashKey, hashValue )
- * [x] redisHashSetIfAbsent( key, hashKey, hashValue )
- * [x] redisHashUnset( key, hashKey )
- * [x] redisHashIsSet( key, hashKey )
- * [x] redisHashGet( key, hashKey )
- * [x] redisLog( level, message )
-
- They are documented in the [Redis Module API page](https://github.com/antirez/redis/blob/unstable/src/modules/API.md)
+##Redis.Hash
+This class encapsulated a redis hash object.
+## Redis.Hash
+This class represents a Redis `HASH` class, a hash table.
+### Redis.Hash( key )
+Creates a new instance of `Redis.Hash` bound to the specified Redis key. This will not 
+create a corresponding Redis hash if it is not present in the database.
+### Redis.Hash.delete();
+Deletes the corresponding Redis hash from the database. Returns `true` if a key was deleted.
+### Redis.Hash.getExpire();
+Returns the milliseconds left until the corresponding Redis hash expires or `undefined` if there is no such hash in Redis or if no timeout is set.
+### Redis.Hash.length();
+Returns the number of elements in the hash in Redis or `undefined` if there is no such hash.
+### Redis.Hash.setExpire( milliseconds );
+Sets an expiration time of `milliseconds` milliseconds on the corresponding Redis hash. Returns `undefined` if no such hash was found.
+### Redis.Hash.insert( key, value )
+Inserts a new element in the hash with the specified `key` as key and `value` as value. Returns `true` if a new element was inserted, and `false` if an element was already present. Ìt will return `undefined` if the hash is not found.
+### Redis.Hash.upsert( key, value )
+Updates the element specified by `key` with a value of `value` or inserts a new element with `key` as key if such is not found. It will return `undefined` if the hash is not found.
+### Redis.Hash.update( key, value )
+Updates the element specified by `key` with a value of `value` or returns `false` if such is not found. It will return `undefined` if the hash is not found.
+### Redis.Hash.remove( key )
+Removes the element specified by `key` from the hash and returns `true`. It will return `false` if no element was removed and `undefined` if the hash was not found.
+### Redis.Hash.lookup( key )
+Returns the value of the element specified by `key` or `undefined` if the hash was not found.
+### Redis.Hash.exists( key )
+Returns `true` if an element specified by `key` exists, `false` if it does not, or `undefined` if the hash was not found.
