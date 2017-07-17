@@ -54,7 +54,6 @@ Redis.String.prototype = Object.create(Redis.Object.prototype);
 Redis.String.prototype.constructor = Redis.String;
 Redis.String.prototype.set = function(value) { return redisStringSet(this.key,value); }
 Redis.String.prototype.get = function() { return redisStringGet(this.key); }
-Redis.String.prototype.truncate = function(newLength) { return redisStringTruncate(this.key,newLength); }
 
 // List
 

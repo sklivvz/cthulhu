@@ -8,7 +8,10 @@
 
 #include "commands.h"
 
+
 void register_commands(duk_context *_ctx) {
+  auto_replication = 1;
+
   duk_push_global_object(_ctx);
   duk_idx_t idx_top = duk_get_top_index(_ctx);
  
@@ -38,9 +41,6 @@ void register_commands(duk_context *_ctx) {
 
   duk_push_c_function(_ctx, string_set, 2);
   duk_put_prop_string(_ctx, idx_top, "redisStringSet");
-
-  duk_push_c_function(_ctx, string_truncate, 2);
-  duk_put_prop_string(_ctx, idx_top, "redisStringTruncate");
 
   duk_push_c_function(_ctx, string_get, 1);
   duk_put_prop_string(_ctx, idx_top, "redisStringGet");
@@ -120,6 +120,12 @@ void register_commands(duk_context *_ctx) {
   duk_push_c_function(_ctx, hash_get, 2);
   duk_put_prop_string(_ctx, idx_top, "redisHashGet");
 
+  duk_push_c_function(_ctx, set_auto_replication, 1);
+  duk_put_prop_string(_ctx, idx_top, "redisSetAutoReplication");
+
+  duk_push_c_function(_ctx, get_auto_replication, 0);
+  duk_put_prop_string(_ctx, idx_top, "redisGetAutoReplication");
+
   duk_push_c_function(_ctx, log_to_redis, 2);
   duk_put_prop_string(_ctx, idx_top, "redisLog");
 }
@@ -142,6 +148,9 @@ duk_ret_t get_selected_db(duk_context *_ctx){
 duk_ret_t select_db(duk_context *_ctx){
   int newid = duk_require_int(_ctx, 0);
   int ret = RedisModule_SelectDb(RM_ctx, newid);
+
+  if (auto_replication)
+    RedisModule_Replicate(RM_ctx, "SELECT", "l", newid);
 
   duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
@@ -168,6 +177,10 @@ duk_ret_t delete_key(duk_context *_ctx){
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_DeleteKey(key_h);
+
+  if (auto_replication)
+    RedisModule_Replicate(RM_ctx, "DEL", "s", RMS_Key);
+
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
@@ -199,6 +212,10 @@ duk_ret_t set_expire(duk_context *_ctx){
   RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_SetExpire(key_h, expire);
+
+  if (auto_replication)
+    RedisModule_Replicate(RM_ctx, "EXPIRE", "sl", RMS_Key, expire);
+
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
 
@@ -213,23 +230,14 @@ duk_ret_t string_set(duk_context *_ctx){
   RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_StringSet(key_h, RMS_Value);
+
+  if (auto_replication)
+    RedisModule_Replicate(RM_ctx, "SET", "ss", RMS_Key, RMS_Value);
+
   RedisModule_CloseKey(key_h);
   duk_pop(_ctx);
   RedisModule_FreeString(RM_ctx, RMS_Key);
   RedisModule_FreeString(RM_ctx, RMS_Value);
-
-  duk_push_boolean(_ctx, ret == REDISMODULE_OK);
-  return 1;
-}
-
-duk_ret_t string_truncate(duk_context *_ctx){
-  const char * key = duk_require_string(_ctx, 0); // key name
-  mstime_t newlen = duk_require_int(_ctx, 1);
-  RedisModuleString *RMS_Key = RedisModule_CreateString(RM_ctx, key, strlen(key));
-  void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
-  int ret = RedisModule_StringTruncate(key_h, newlen);
-  RedisModule_CloseKey(key_h);
-  RedisModule_FreeString(RM_ctx, RMS_Key);
 
   duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
@@ -754,6 +762,16 @@ duk_ret_t log_to_redis(duk_context *_ctx){
   duk_pop(_ctx);
 
   return 0;
+}
+
+duk_ret_t set_auto_replication(duk_context *_ctx){
+  auto_replication = duk_require_boolean(_ctx, 0); 
+  return 0;
+}
+
+duk_ret_t get_auto_replication(duk_context *_ctx){
+  duk_push_boolean(_ctx, auto_replication); 
+  return 1;
 }
 
 int load_file_to_context(duk_context *_ctx, const char *filename) { 

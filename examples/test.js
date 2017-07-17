@@ -10,7 +10,6 @@ function test() {
     Redis.notice("Redis.String.length: " + rlyeh.length());
     Redis.notice("Redis.String.setExpire: " + rlyeh.setExpire(10000));
     Redis.notice("Redis.String.getExpire: " + rlyeh.getExpire());
-    Redis.notice("Redis.String.truncate: " + rlyeh.truncate(13));
     Redis.notice("Redis.String.length: " + rlyeh.length());
     Redis.notice("Redis.String.get: " + rlyeh.get());
     Redis.notice("Redis.String.delete: " + rlyeh.delete());

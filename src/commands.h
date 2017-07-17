@@ -14,6 +14,7 @@
 
 duk_context *_ctx;
 RedisModuleCtx *RM_ctx;
+duk_bool_t auto_replication;
 
 duk_ret_t milliseconds(duk_context *_ctx);
 duk_ret_t get_client_id(duk_context *_ctx);
@@ -24,7 +25,6 @@ duk_ret_t delete_key(duk_context *_ctx);
 duk_ret_t get_expire(duk_context *_ctx);
 duk_ret_t set_expire(duk_context *_ctx);
 duk_ret_t string_set(duk_context *_ctx);
-duk_ret_t string_truncate(duk_context *_ctx);
 duk_ret_t string_get(duk_context *_ctx);
 duk_ret_t list_push(duk_context *_ctx);
 duk_ret_t list_pop(duk_context *_ctx);
@@ -52,6 +52,9 @@ duk_ret_t hash_unset(duk_context *_ctx);
 duk_ret_t hash_is_set(duk_context *_ctx);
 duk_ret_t hash_get(duk_context *_ctx);
 duk_ret_t log_to_redis(duk_context *_ctx);
+duk_ret_t get_auto_replication(duk_context *_ctx);
+duk_ret_t set_auto_replication(duk_context *_ctx);
+
 
 int load_file_to_context(duk_context *_ctx, const char *filename);
 
