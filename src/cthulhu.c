@@ -6,9 +6,9 @@
 // 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "redismodule.h"
-#include "duktape.h"
-#include "commands.h"
+#include "lib/redismodule.h"
+#include "lib/duktape.h"
+#include "commands/commands.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -16,8 +16,30 @@
 #include <string.h>
 #include <libgen.h>
 
-duk_context *_ctx;
-RedisModuleCtx *RM_ctx;
+int load_file_to_context(duk_context *_ctx, const char *filename) { 
+	size_t size = 0;
+	FILE *f = fopen(filename, "rb");
+  char * source;
+
+	if (f == NULL) 	{ 
+    source = NULL;
+    duk_push_undefined(_ctx);
+		return -1;
+	} 
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	source = (char *)RedisModule_Alloc(size);
+	if (size != fread(source, sizeof(char), size, f)) { 
+		RedisModule_Free(source);
+    source = NULL;
+    duk_push_undefined(_ctx);
+		return -2;
+	} 
+	fclose(f);
+	duk_push_lstring(_ctx, (const char *) source, (duk_size_t) size);
+	return size;
+}
 
 int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 

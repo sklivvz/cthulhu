@@ -249,10 +249,6 @@ Redis.notice("Redis.String.length: " + rlyeh.length());       // logs 150
 rlyeh.setExpire(10000);
 Redis.notice("Redis.String.getExpire: " + rlyeh.getExpire()); // logs 10000
 
-rlyeh.truncate(13);
-Redis.notice("Redis.String.length: " + rlyeh.length());       // logs 13
-Redis.notice("Redis.String.get: " + rlyeh.get());             // logs "The Nightmare"
-
 rlyeh.delete();
 rlyeh.get();                                                // logs undefined
 ```
@@ -272,5 +268,4 @@ Returns the length of the string in Redis or `undefined` if there is no such str
 Sets the value of the corresponding string in Redis. If no such string exists, it creates it. It returns `true` if the operation was succesful.
 ## Redis.String.setExpire( milliseconds );
 Sets an expiration time of `milliseconds` milliseconds on the corresponding Redis string. Returns `undefined` if no such string was found.
-## Redis.String.truncate( newLength );
-Resizes the corresponding Redis string to the specified length. Practically speaking, only shorter lengths should be used. Returns `true` if succesful.
+
