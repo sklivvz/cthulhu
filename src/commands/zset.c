@@ -249,13 +249,17 @@ double get_number_or_default(duk_context *_ctx, duk_idx_t idx, double _default) 
 
 duk_ret_t zset_range_stop(duk_context *_ctx) {
   RedisModuleKey * key_h = (RedisModuleKey *) duk_require_pointer(_ctx, 0); // key
-  RedisModule_ZsetRangeStop(key_h);
+  if (RedisModule_KeyType(key_h) != REDISMODULE_KEYTYPE_ZSET) return 0;
   RedisModule_CloseKey(key_h);  
   return 0;
 }
 
 duk_ret_t zset_range_end_reached(duk_context *_ctx) {
   RedisModuleKey * key_h = (RedisModuleKey *) duk_require_pointer(_ctx, 0); // key
+  if (RedisModule_KeyType(key_h) != REDISMODULE_KEYTYPE_ZSET) {
+    duk_push_undefined(_ctx);
+    return 1;
+  }
   int ret = RedisModule_ZsetRangeEndReached(key_h);
   duk_push_boolean(_ctx, ret);
   return 1;
@@ -341,6 +345,10 @@ duk_ret_t zset_last_in_lex_range(duk_context *_ctx)  {
 
 duk_ret_t zset_range_current_element(duk_context *_ctx) {
   RedisModuleKey * key_h = (RedisModuleKey *) duk_require_pointer(_ctx, 0); // key
+  if (RedisModule_KeyType(key_h) != REDISMODULE_KEYTYPE_ZSET) {
+    duk_push_undefined(_ctx);
+    return 1;
+  }
   double score;
   RedisModuleString * value = RedisModule_ZsetRangeCurrentElement(key_h, &score);
   if (value == NULL) {
@@ -359,6 +367,10 @@ duk_ret_t zset_range_current_element(duk_context *_ctx) {
 
 duk_ret_t zset_range_next(duk_context *_ctx) {
   RedisModuleKey * key_h = (RedisModuleKey *) duk_require_pointer(_ctx, 0); // key
+  if (RedisModule_KeyType(key_h) != REDISMODULE_KEYTYPE_ZSET) {
+    duk_push_undefined(_ctx);
+    return 1;
+  }
   int ret = RedisModule_ZsetRangeNext(key_h);
   duk_push_boolean(_ctx, ret);
   return 1;
@@ -366,6 +378,10 @@ duk_ret_t zset_range_next(duk_context *_ctx) {
 
 duk_ret_t zset_range_prev(duk_context *_ctx) {
   RedisModuleKey * key_h = (RedisModuleKey *) duk_require_pointer(_ctx, 0); // key
+  if (RedisModule_KeyType(key_h) != REDISMODULE_KEYTYPE_ZSET) {
+    duk_push_undefined(_ctx);
+    return 1;
+  }
   int ret = RedisModule_ZsetRangePrev(key_h);
   duk_push_boolean(_ctx, ret);
   return 1;

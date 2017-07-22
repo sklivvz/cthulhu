@@ -1,4 +1,11 @@
 function test() {
+    Redis.setAutoReplication(true);
+    Redis.notice("Auto Replication: "+ Redis.getAutoReplication());
+
+    var rand = new Redis.String("RANDOM");
+    rand.set(Math.random());
+    Redis.notice("'RANDOM' set to '"+rand.get()+"'");
+    
     Redis.notice("Starting the test");
     Redis.notice("Redis.milliseconds(): " + Redis.milliseconds());
     Redis.notice("Redis.clientId(): " + Redis.clientId());
@@ -62,7 +69,4 @@ function test() {
     }
     var range = nyarlathotep.getRange({min:0, max:2, minInc:true});
     range.each(function(elem){Redis.notice("iterating ["+elem.key+"], "+elem.score);})
-    range.stop();
-    
-
 }

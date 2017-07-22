@@ -22,6 +22,8 @@ Redis.warn = function(message) { return redisLog("warning",message); }
 Redis.notice = function(message) { return redisLog("notice",message); }
 Redis.verbose = function(message) { return redisLog("verbose",message); }
 Redis.debug = function(message) { return redisLog("debug",message); }
+Redis.getAutoReplication = function(value) { return redisGetAutoReplication(); }
+Redis.setAutoReplication = function(value) { return redisSetAutoReplication(value); }
 
 // Base class with all shared object methods
 
@@ -87,6 +89,7 @@ Redis.Hash.prototype.exists = function(key) { return redisHashIsSet(this.key,key
 Redis.SortedSet = function(name) {
     Redis.Object.call(this, name);
     Range = function(key,config){
+        this.keyPtr = undefined;
         this.config = {};
         this.config.reverse = config.reverse || false;
         this.config.score = config.score === false ? false : true;
