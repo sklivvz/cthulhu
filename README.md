@@ -3,11 +3,11 @@ Extend Redis with JavaScript modules
 
 ![courtesy of https://www.flickr.com/photos/gwendalcentrifugue/18161295638/in/album-72157651670726983/](http://i.imgur.com/F0FwUPOl.png)
 
-This module invokes commands from Redis in a JavaScript interpreter (*the thing that should not be*)
+This module invokes commands from Redis in a JavaScript interpreter, `duktape`. (*the thing that should not be*)
 
 The JavaScript commands are precompiled, can access the Redis API at a low level, and if judiciously used, can result in very good performance.
 
-This module depends on Redis 4.0, which is still unstable software and a pending patch. Being alpha itself, API compatibility is not yet guaranteed.
+This module depends on Redis 4.0.
 
 Issue reports and feature requests by corageous hackers are welcome. Please don't send patches just yet. Our roadmap is [here](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md).
 
@@ -29,11 +29,11 @@ For a quick introduction, please follow the instructions in our [intro](https://
 
 To build the module from source, the instructions are in our [build](https://github.com/sklivvz/cthulhu/blob/master/docs/build.md) page.
 
-The full documentation of the Redis API, inclding the updated implementation status is in our [API](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md) doc.
+The full documentation of the Redis API, including the updated implementation status is in our [API](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md) doc.
 
  ## Version
 
- The current version is 0.2.
+ The current version is 0.3.
 
  ## License
 
