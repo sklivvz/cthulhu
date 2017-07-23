@@ -66,6 +66,19 @@ Adds the passed `message` to the redis log with a log level of `verbose`.
 ## Redis.debug( message )
 Adds the passed `message` to the redis log with a log level of `debug`.
 
+## Redis.setAutoReplicate( value )
+If `value` is true, all JavaScript API calls that have side effects will be replicated to all dependent slave nodes of Redis. In other words, the contents of the Redis DB should be syncronized.
+
+Note that other pure JavaScript side effects are not replicated, so if you keep state in JavaScript, that state won't be replicated onto the slave servers.
+
+If `value` is false, no JavaScript call will me replicated anywhere.
+
+The default value is `false`.
+
+## Redis.getAutoReplicate()
+
+Returns `true` if auto replication is active, `false` otherwise.
+
 ---
 
 # Redis.Hash
