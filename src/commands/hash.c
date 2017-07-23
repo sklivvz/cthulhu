@@ -21,7 +21,14 @@ duk_ret_t hash_set(duk_context *_ctx){
 
   int ret = RedisModule_HashSet(key_h, REDISMODULE_HASH_NONE | REDISMODULE_HASH_CFIELDS, hashkey, RMS_HashValue, NULL);
   if (auto_replication){
-    RedisModule_Replicate(RM_ctx, "HSET", "scs", RMS_Key, hashkey, RMS_HashValue);
+    int res = RedisModule_Replicate(RM_ctx, "HSET", "scs", RMS_Key, hashkey, RMS_HashValue);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_HashValue);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);
@@ -45,7 +52,14 @@ duk_ret_t hash_set_if_absent(duk_context *_ctx){
   int ret = RedisModule_HashSet(key_h, REDISMODULE_HASH_NX | REDISMODULE_HASH_CFIELDS, hashkey, RMS_HashValue, NULL);
 
   if (auto_replication){
-    RedisModule_Replicate(RM_ctx, "HSETNX", "scs", RMS_Key, hashkey, RMS_HashValue);
+    int res = RedisModule_Replicate(RM_ctx, "HSETNX", "scs", RMS_Key, hashkey, RMS_HashValue);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_HashValue);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);
@@ -70,7 +84,14 @@ duk_ret_t hash_update_if_present(duk_context *_ctx){
 
   if (auto_replication){
     // not *exactly* the same, but it should have the same effect
-    RedisModule_Replicate(RM_ctx, "HSET", "scs", RMS_Key, hashkey, RMS_HashValue);
+    int res = RedisModule_Replicate(RM_ctx, "HSET", "scs", RMS_Key, hashkey, RMS_HashValue);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_HashValue);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);
@@ -91,7 +112,13 @@ duk_ret_t hash_unset(duk_context *_ctx){
 
   int ret = RedisModule_HashSet(key_h, REDISMODULE_HASH_CFIELDS, hashkey, REDISMODULE_HASH_DELETE, NULL);
   if (auto_replication){
-    RedisModule_Replicate(RM_ctx, "HDEL", "sc", RMS_Key, hashkey);
+    int res = RedisModule_Replicate(RM_ctx, "HDEL", "sc", RMS_Key, hashkey);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);

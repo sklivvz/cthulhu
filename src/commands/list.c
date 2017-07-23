@@ -22,8 +22,16 @@ duk_ret_t list_push(duk_context *_ctx) {
   
   int ret = RedisModule_ListPush(key_h, (where ? REDISMODULE_LIST_HEAD : REDISMODULE_LIST_TAIL), RMS_Value);
 
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, where ? "LPUSH":"RPUSH", "ss", RMS_Key, RMS_Value);
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, where ? "LPUSH":"RPUSH", "ss", RMS_Key, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
 
 
   RedisModule_CloseKey(key_h);
@@ -47,9 +55,16 @@ duk_ret_t list_pop(duk_context *_ctx) {
   
   RedisModuleString *RMS_Value = RedisModule_ListPop(key_h, (where ? REDISMODULE_LIST_HEAD : REDISMODULE_LIST_TAIL));
 
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, where ? "LPOP":"RPOP", "s", RMS_Key);
-
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, where ? "LPOP":"RPOP", "s", RMS_Key);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
   RedisModule_CloseKey(key_h);
 
   size_t len;

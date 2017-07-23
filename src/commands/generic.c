@@ -28,8 +28,13 @@ duk_ret_t select_db(duk_context *_ctx){
   int newid = duk_require_int(_ctx, 0);
   int ret = RedisModule_SelectDb(RM_ctx, newid);
 
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, "SELECT", "l", newid);
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, "SELECT", "l", newid);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
 
   duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;
@@ -57,8 +62,15 @@ duk_ret_t delete_key(duk_context *_ctx){
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_DeleteKey(key_h);
 
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, "DEL", "s", RMS_Key);
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, "DEL", "s", RMS_Key);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
 
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);
@@ -92,8 +104,15 @@ duk_ret_t set_expire(duk_context *_ctx){
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_SetExpire(key_h, expire);
 
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, "EXPIRE", "sl", RMS_Key, expire);
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, "EXPIRE", "sl", RMS_Key, expire);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
 
   RedisModule_CloseKey(key_h);
   RedisModule_FreeString(RM_ctx, RMS_Key);

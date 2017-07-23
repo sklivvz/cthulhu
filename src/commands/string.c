@@ -10,6 +10,12 @@
 #include "../lib/redismodule.h"
 #include "../lib/duktape.h"
 
+duk_ret_t test(duk_context *_ctx) {
+  RedisModule_Replicate(RM_ctx, "SET", "cc", "foo", "0");
+  int res = RedisModule_Replicate(RM_ctx, "ZINCRBY", "cccc", "XX", "CTHULHU", "0.666", "SHOGGOTH");
+  RedisModule_Log(RM_ctx, "notice", "The call returned: %d", res);
+  return 0;
+}
 
 duk_ret_t string_set(duk_context *_ctx){
   const char * key = duk_require_string(_ctx, 0); // key name
@@ -18,14 +24,18 @@ duk_ret_t string_set(duk_context *_ctx){
   RedisModuleString *RMS_Value = RedisModule_CreateString(RM_ctx, value, strlen(value));
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_StringSet(key_h, RMS_Value);
-
-  if (auto_replication)
-    RedisModule_Replicate(RM_ctx, "SET", "ss", RMS_Key, RMS_Value);
-
   RedisModule_CloseKey(key_h);
   duk_pop(_ctx);
   RedisModule_FreeString(RM_ctx, RMS_Key);
   RedisModule_FreeString(RM_ctx, RMS_Value);
+
+  if (auto_replication) {
+    int res = RedisModule_Replicate(RM_ctx, "SET", "cc", key, value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "warning", "replication failed");
+      duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
+  }
 
   duk_push_boolean(_ctx, ret == REDISMODULE_OK);
   return 1;

@@ -50,7 +50,6 @@ int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, in
   if (argc < 2) {
     return RedisModule_WrongArity(ctx);
   }
-
   duk_push_global_object(_ctx);
   duk_get_prop_string(_ctx, -1, RedisModule_StringPtrLen(argv[1], &length));
 
@@ -89,7 +88,6 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   size_t len = 0;
   const char * filename = RedisModule_StringPtrLen(argv[0], &len);
   
-  //TODO: see http://duktape.org/guide.html#error-handling
   _ctx = duk_create_heap_default();
   if (!_ctx) {
     RedisModule_Log(ctx, "warning", "Failed to create a Duktape heap.\n");
@@ -118,7 +116,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
   if (load_file_to_context(_ctx, filename)<0) return REDISMODULE_ERR;
 
   if (duk_peval(_ctx) != 0) {
-    printf("Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
+    RedisModule_Log(ctx, "warning", "Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
     return REDISMODULE_ERR;
   }
 

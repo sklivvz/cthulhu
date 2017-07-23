@@ -24,7 +24,14 @@ duk_ret_t zset_add(duk_context *_ctx) {
   if (auto_replication){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZADD", "scs", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZADD", "scs", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);
@@ -53,7 +60,14 @@ duk_ret_t zset_update_if_present(duk_context *_ctx) {
   if (auto_replication){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZADD", "cscs", "XX", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZADD", "cscs", "XX", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
 
   RedisModule_CloseKey(key_h);
@@ -81,7 +95,14 @@ duk_ret_t zset_add_if_absent(duk_context *_ctx) {
   if (auto_replication){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZADD", "cscs", "NX", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZADD", "cscs", "NX", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
   RedisModule_CloseKey(key_h);
 
@@ -109,7 +130,14 @@ duk_ret_t zset_incrby(duk_context *_ctx) {
   if (auto_replication){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZINCRBY", "scs", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZINCRBY", "scs", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
   RedisModule_CloseKey(key_h);
 
@@ -138,10 +166,17 @@ duk_ret_t zset_incrby_if_present(duk_context *_ctx) {
 
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_ZsetIncrby(key_h, score, RMS_Value, &flags, &newScore);
-  if (auto_replication){
+  if (auto_replication && flags != REDISMODULE_ZADD_NOP){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZINCRBY", "cscs", "XX", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZINCRBY", "scs", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
   RedisModule_CloseKey(key_h);
 
@@ -172,7 +207,14 @@ duk_ret_t zset_incrby_if_absent(duk_context *_ctx) {
   if (auto_replication){
     char output[50];
     snprintf(output, 50, "%f", score);
-    RedisModule_Replicate(RM_ctx, "ZINCRBY", "cscs", "NX", RMS_Key, output, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZINCRBY", "cscs", "NX", RMS_Key, output, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
   RedisModule_CloseKey(key_h);
 
@@ -200,7 +242,14 @@ duk_ret_t zset_rem(duk_context *_ctx) {
   void *key_h = RedisModule_OpenKey(RM_ctx, RMS_Key, REDISMODULE_WRITE);
   int ret = RedisModule_ZsetRem(key_h, RMS_Value, &deleted);
   if (auto_replication){
-    RedisModule_Replicate(RM_ctx, "ZREM", "ss", RMS_Key, RMS_Value);
+    int res = RedisModule_Replicate(RM_ctx, "ZREM", "ss", RMS_Key, RMS_Value);
+    if (res == REDISMODULE_ERR) {
+      RedisModule_Log(RM_ctx, "error", "replication failed");
+      RedisModule_CloseKey(key_h);
+      RedisModule_FreeString(RM_ctx, RMS_Key);
+      RedisModule_FreeString(RM_ctx, RMS_Value);
+      return duk_error(_ctx, DUK_ERR_TYPE_ERROR, "replication failed");
+    }
   }
   RedisModule_CloseKey(key_h);
 

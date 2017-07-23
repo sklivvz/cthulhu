@@ -1,4 +1,6 @@
 function test() {
+    Redis.notice("Starting the test");
+
     Redis.setAutoReplication(true);
     Redis.notice("Auto Replication: "+ Redis.getAutoReplication());
 
@@ -6,7 +8,6 @@ function test() {
     rand.set(Math.random());
     Redis.notice("'RANDOM' set to '"+rand.get()+"'");
     
-    Redis.notice("Starting the test");
     Redis.notice("Redis.milliseconds(): " + Redis.milliseconds());
     Redis.notice("Redis.clientId(): " + Redis.clientId());
     Redis.notice("Redis.getSelectedDb(): " + Redis.getSelectedDb());
@@ -63,7 +64,6 @@ function test() {
     Redis.notice("Redis.SortedSet.delete: " + nyarlathotep.delete());
     Redis.notice("Redis.SortedSet.remove: " + nyarlathotep.remove("atheron"));
 
-    var nyarlathotep = new Redis.SortedSet("Nyarlathotep");
     for(var i = 0; i<100; i++) {
         nyarlathotep.upsert("atheron "+i, Math.sqrt(i));
     }
