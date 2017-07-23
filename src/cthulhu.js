@@ -90,8 +90,11 @@ Redis.SortedSet = function(name) {
     Redis.Object.call(this, name);
     Range = function(key,config){
         this.keyPtr = undefined;
+        config |= {};
         this.config = {};
-        this.config.reverse = config.reverse || false;
+        this.config.reverse = false;
+        if (config.reverse != undefined)
+            this.config.reverse = config.reverse;
         this.config.score = config.score === false ? false : true;
         this.config.min = config.min || undefined;
         this.config.max = config.max || undefined;
