@@ -17,28 +17,31 @@
 #include <libgen.h>
 
 int load_file_to_context(duk_context *_ctx, const char *filename) { 
-	size_t size = 0;
-	FILE *f = fopen(filename, "rb");
+  size_t size = 0;
+  FILE *f = fopen(filename, "rb");
   char * source;
 
-	if (f == NULL) 	{ 
+  if (f == NULL) 	{ 
     source = NULL;
     duk_push_undefined(_ctx);
-		return -1;
-	} 
-	fseek(f, 0, SEEK_END);
-	size = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	source = (char *)RedisModule_Alloc(size);
-	if (size != fread(source, sizeof(char), size, f)) { 
-		RedisModule_Free(source);
+    return -1;
+  }
+
+  fseek(f, 0, SEEK_END);
+  size = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  source = (char *)RedisModule_Alloc(size);
+  if (size != fread(source, sizeof(char), size, f)) { 
+    fclose(f);
+    RedisModule_Free(source);
     source = NULL;
     duk_push_undefined(_ctx);
-		return -2;
-	} 
-	fclose(f);
-	duk_push_lstring(_ctx, (const char *) source, (duk_size_t) size);
-	return size;
+    return -2;
+  } 
+  fclose(f);
+  duk_push_lstring(_ctx, (const char *) source, (duk_size_t) size);
+  RedisModule_Free(source);
+  return size;
 }
 
 int CthulhuInvoke_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
@@ -96,16 +99,29 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
 
   register_commands(_ctx);
 
-  char * js = strcpy(malloc(strlen(filename)+1), filename);
-  js = dirname(js);
-  strcat(js,"/cthulhu.js");
+  char *path = strdup(filename);
+  if (path == NULL) {
+    RedisModule_Log(ctx, "warning", "Out of memory.\n");
+    return REDISMODULE_ERR;
+  }
+  char *dir = dirname(path);
+
+  char *js;
+  if (asprintf(&js, "%s/cthulhu.js", dir) < 0) {
+    free(path);
+    RedisModule_Log(ctx, "warning", "Out of memory.\n");
+    return REDISMODULE_ERR;
+  }
 
   RedisModule_Log(ctx, "notice", "Loading `%s'...", js);
   if (load_file_to_context(_ctx, js)<0) {
     free(js);
+    free(path);
+    RedisModule_Log(ctx, "warning", "Could not read file.\n");
     return REDISMODULE_ERR;
   }
   free(js);
+  free(path);
 
   if (duk_peval(_ctx) != 0) {
     RedisModule_Log(ctx, "warning", "Compile failed: %s\n", duk_safe_to_string(_ctx, -1));
