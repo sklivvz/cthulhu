@@ -3,7 +3,7 @@ function DeleteTop(name, num) {
     var i = 0;
     var range = set.getRange();
     range.each(function(elem){
-        if (i++<10) {
+        if (i++<num) {
             set.remove(elem.key);
         }
     });
