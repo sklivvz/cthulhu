@@ -11,4 +11,5 @@ Here's the current plan for Cthulhu. The current version is still pre 0.1.
 * [ ] return type to redis should be specific and not string
 * [ ] support for generic LUA style calls (`RedisModule_Call`)
 * [ ] support for manual replication
-* [ ] more Redis API if needed 
+* [ ] more Redis API if needed
+* [ ] support for pub/sub callbacks
