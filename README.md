@@ -21,7 +21,7 @@ MODULE LOAD /path/to/cthulhu.so /path/to/your/javascript.js
 
 This will load and compile your JavaScript file. All the global functions you expose will be callable by any Redis client.
 
-The module can be unloaded like any other (see the [docs](https://github.com/antirez/redis/blob/unstable/src/modules/INTRO.md#loading-modules)). Unloading a module will also unload the JavaScript context, so all work which is not saved in Redis objects will be nuked. This also allows you reload a new version of a JavaScript file, which is useful during development.
+The module can be unloaded like any other (see the [docs](https://redis.io/topics/modules-intro#loading-modules)). Unloading a module will also unload the JavaScript context, so all work which is not saved in Redis objects will be nuked. This also allows you reload a new version of a JavaScript file, which is useful during development.
 
 ## Getting Started
 
