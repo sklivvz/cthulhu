@@ -9,7 +9,7 @@ The JavaScript commands are precompiled, can access the Redis API at a low level
 
 This module depends on Redis 4.0.
 
-Issue reports and feature requests by corageous hackers are welcome. Please don't send patches just yet. Our roadmap is [here](https://github.com/sklivvz/cthulhu/blob/master/docs/API.md).
+Issue reports and feature requests by corageous hackers are welcome. Please don't send patches just yet. Our roadmap is [here](https://github.com/sklivvz/cthulhu/blob/master/docs/roadmap.md).
 
 ## Basic Usage
 
