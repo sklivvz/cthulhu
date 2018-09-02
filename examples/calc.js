@@ -1,19 +1,25 @@
 var calc = new Redis.List("calc");
 
 function c(input) {
+
+	// defined locally so it won't be exposed to the API
+	function pop(){
+		return parseInt(calc.pop());
+	}
+	
     switch(input)
     {
         case "+":
-            calc.push(calc.pop()+calc.pop());
+            calc.push(pop()+pop());
             return calc.length();
         case "-":
-            calc.push(calc.pop()-calc.pop());
+            calc.push(pop()-pop());
             return calc.length();
         case "*":
-            calc.push(calc.pop()*calc.pop());
+            calc.push(pop()*pop());
             return calc.length();
         case "/":
-            calc.push(1/calc.pop()*calc.pop());
+            calc.push(1/pop()*pop());
             return calc.length();
         case "=":
             return calc.pop()|0;
