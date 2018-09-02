@@ -22,7 +22,7 @@ function c(input) {
             calc.push(1/pop()*pop());
             return calc.length();
         case "=":
-            return calc.pop()|0;
+            return pop()|0;
         case "c":
         case "C":
             calc.delete();
